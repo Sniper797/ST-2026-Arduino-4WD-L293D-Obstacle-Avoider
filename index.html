@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ST-2026 · 4WD L293D + Ultrasonic — Simulation Log</title>
+<meta name="description" content="Four DC motors on two L293D drivers plus a servo-mounted ultrasonic scanner, simulated in Tinkercad. Smart Methods ST-2026 electrical task 2.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#070a0f;
+  --panel:#0e141d;
+  --panel-2:#131b26;
+  --line:#22303f;
+  --line-hot:#334657;
+  --txt:#e7edf4;
+  --dim:#8595a8;
+  --faint:#5b6a7d;
+  --copper:#e39a54;
+  --copper-deep:#8a5a2b;
+  --phos:#57d99a;
+  --alert:#e8604a;
+  --cyan:#49c2d6;
+  --r:3px;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --disp:"Chakra Petch",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--txt);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+/* perfboard dot grid + vignette */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px,rgba(120,150,180,.13) 1px,transparent 0);
+  background-size:22px 22px;
+  mask-image:radial-gradient(ellipse 120% 90% at 50% 0%,#000 20%,transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse 120% 90% at 50% 0%,#000 20%,transparent 78%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 55% at 50% -10%,rgba(227,154,84,.10),transparent 65%);
+}
+.wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* ─── header ─────────────────────────────────────────── */
+header{position:relative;z-index:1;padding:64px 0 40px;border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--copper);display:flex;align-items:center;gap:14px;margin-bottom:22px;
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--copper-deep),transparent)}
+h1{
+  font-family:var(--disp);font-weight:700;font-size:clamp(2.1rem,6vw,4rem);
+  line-height:1.03;letter-spacing:-.02em;margin:0 0 8px;
+}
+h1 .l2{display:block;color:var(--copper)}
+.tagline{color:var(--dim);max-width:62ch;margin:20px 0 0;font-size:1.03rem}
+.specs{
+  display:flex;flex-wrap:wrap;gap:0;margin-top:34px;
+  border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--panel);
+}
+.spec{flex:1 1 130px;padding:13px 16px;border-right:1px solid var(--line)}
+.spec:last-child{border-right:0}
+.spec dt{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:0}
+.spec dd{font-family:var(--disp);font-weight:600;font-size:1.12rem;margin:3px 0 0;color:var(--txt)}
+
+/* ─── sections ───────────────────────────────────────── */
+section{padding:64px 0;border-bottom:1px solid var(--line)}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.snum{font-family:var(--mono);font-size:12px;color:var(--copper);letter-spacing:.1em;flex:none}
+h2{font-family:var(--disp);font-weight:600;font-size:clamp(1.4rem,3.4vw,2rem);margin:0;letter-spacing:-.01em}
+.sdesc{color:var(--dim);max-width:70ch;margin:10px 0 30px}
+
+/* ─── video ──────────────────────────────────────────── */
+.screen{
+  border:1px solid var(--line-hot);border-radius:var(--r);overflow:hidden;background:#000;
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.9),0 0 0 1px rgba(227,154,84,.07);
+}
+video{display:block;width:100%;height:auto;background:#000}
+
+/* chapter rail */
+.rail{margin-top:18px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:16px 18px 18px}
+.rail-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.rail-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.clock{font-family:var(--mono);font-size:13px;color:var(--copper);font-variant-numeric:tabular-nums}
+.track{
+  position:relative;height:44px;border-radius:2px;overflow:hidden;cursor:pointer;
+  background:var(--panel-2);border:1px solid var(--line);display:flex;
+}
+.seg{
+  position:relative;border-right:1px solid var(--ink);display:flex;align-items:center;
+  padding:0 9px;overflow:hidden;transition:filter .18s;min-width:0;
+}
+.seg:last-child{border-right:0}
+.seg:hover{filter:brightness(1.45)}
+.seg span{
+  font-family:var(--mono);font-size:10px;letter-spacing:.06em;white-space:nowrap;
+  text-overflow:ellipsis;overflow:hidden;color:#04070b;font-weight:600;
+}
+.seg.k-fwd{background:linear-gradient(180deg,#57d99a,#3aa872)}
+.seg.k-rev{background:linear-gradient(180deg,#e8604a,#b8402d)}
+.seg.k-turn{background:repeating-linear-gradient(115deg,#e39a54 0 9px,#c07f3f 9px 18px)}
+.seg.k-idle{background:linear-gradient(180deg,#2b3a4b,#1e2937)}
+.seg.k-idle span{color:var(--dim)}
+.seg.k-stop{background:linear-gradient(180deg,#49c2d6,#2f8fa1)}
+.playhead{
+  position:absolute;top:0;bottom:0;width:2px;background:#fff;left:0;
+  box-shadow:0 0 9px 2px rgba(255,255,255,.65);pointer-events:none;transition:left .1s linear;
+}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.chip{
+  font-family:var(--mono);font-size:11px;padding:6px 11px;border-radius:2px;cursor:pointer;
+  background:var(--panel-2);color:var(--dim);border:1px solid var(--line);
+  transition:all .16s;
+}
+.chip:hover,.chip:focus-visible{border-color:var(--copper);color:var(--copper);outline:none}
+.chip b{color:var(--txt);font-weight:600}
+.chip[aria-current="true"]{background:var(--copper);border-color:var(--copper);color:#0a0d12}
+.chip[aria-current="true"] b{color:#0a0d12}
+
+/* ─── timing diagram ─────────────────────────────────── */
+.scope{
+  border:1px solid var(--line);border-radius:var(--r);background:var(--panel);
+  padding:22px 20px 14px;overflow-x:auto;
+}
+.scope svg{display:block;min-width:640px;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--dim)}
+.legend i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:7px;border-radius:2px}
+
+/* ─── figure ─────────────────────────────────────────── */
+figure{margin:0}
+figure img{
+  display:block;width:100%;height:auto;border:1px solid var(--line-hot);border-radius:var(--r);
+  box-shadow:0 24px 60px -24px rgba(0,0,0,.9);
+}
+figcaption{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:12px;line-height:1.6}
+
+/* ─── pin table ──────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px;min-width:560px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
+thead th{
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);
+  background:var(--panel-2);font-weight:500;
+}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:rgba(227,154,84,.045)}
+td.pin{color:var(--copper);font-weight:600;white-space:nowrap}
+td.pwm::after{content:" ~";color:var(--phos)}
+.u1{color:var(--phos)}.u2{color:var(--cyan)}
+
+/* ─── sketch cards ───────────────────────────────────── */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:22px;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0 auto 0 0;width:2px;background:var(--copper)}
+.card.two::before{background:var(--cyan)}
+.card h3{font-family:var(--disp);font-size:1.12rem;margin:0 0 4px;font-weight:600}
+.card .fname{font-family:var(--mono);font-size:11px;color:var(--copper);word-break:break-all}
+.card.two .fname{color:var(--cyan)}
+.card p{color:var(--dim);font-size:.94rem;margin:14px 0 0}
+.card ol{color:var(--dim);font-size:.9rem;margin:12px 0 0;padding-left:20px}
+.card ol li{margin:5px 0}
+
+/* ─── notes ──────────────────────────────────────────── */
+.notes{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.note{background:var(--panel);padding:22px 24px}
+.note h3{font-family:var(--disp);font-size:1.02rem;margin:0 0 9px;font-weight:600;display:flex;gap:10px;align-items:baseline}
+.note h3 em{font-family:var(--mono);font-style:normal;font-size:10px;letter-spacing:.14em;color:var(--copper);text-transform:uppercase;flex:none}
+.note p{margin:0;color:var(--dim);font-size:.94rem}
+.note p+p{margin-top:10px}
+code{
+  font-family:var(--mono);font-size:.88em;background:var(--panel-2);
+  border:1px solid var(--line);border-radius:2px;padding:1px 5px;color:var(--copper);
+}
+
+/* ─── footer ─────────────────────────────────────────── */
+footer{padding:52px 0 72px;color:var(--faint);font-size:.9rem}
+.repo{
+  display:inline-flex;align-items:center;gap:11px;font-family:var(--mono);font-size:13px;
+  color:var(--txt);text-decoration:none;border:1px solid var(--line-hot);border-radius:var(--r);
+  padding:12px 18px;transition:all .18s;background:var(--panel);
+}
+.repo:hover{border-color:var(--copper);color:var(--copper);transform:translateY(-1px)}
+.fnote{margin-top:26px;font-family:var(--mono);font-size:11px;line-height:1.8}
+
+/* ─── entrance ───────────────────────────────────────── */
+@media (prefers-reduced-motion:no-preference){
+  .rise{animation:rise .7s cubic-bezier(.2,.7,.3,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+}
+@media (max-width:760px){
+  header{padding:44px 0 30px}
+  section{padding:46px 0}
+  .cards{grid-template-columns:1fr}
+  .spec{flex:1 1 50%;border-bottom:1px solid var(--line)}
+  .seg span{display:none}
+  .track{height:34px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow rise">Smart Methods · ST-2026 · Electrical Task 02</p>
+    <h1 class="rise" style="animation-delay:.06s">
+      Four DC Motors,<span class="l2">Two L293D Drivers.</span>
+    </h1>
+    <p class="tagline rise" style="animation-delay:.12s">
+      A 4WD chassis driven through two H-bridge chips on an Arduino Uno, with a
+      servo-mounted ultrasonic scanner that stops all four motors and changes direction
+      when an obstacle reaches 10&nbsp;cm. Simulated end to end in Tinkercad.
+    </p>
+    <dl class="specs rise" style="animation-delay:.18s">
+      <div class="spec"><dt>Board</dt><dd>Arduino Uno R3</dd></div>
+      <div class="spec"><dt>Drivers</dt><dd>2 × L293D</dd></div>
+      <div class="spec"><dt>Motors</dt><dd>4 DC + 1 servo</dd></div>
+      <div class="spec"><dt>Sensor</dt><dd>PING))) 3-pin</dd></div>
+      <div class="spec"><dt>Trigger</dt><dd>10 cm</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main>
+
+<!-- ══ 01 WATCH ══ -->
+<section id="watch">
+  <div class="wrap">
+    <div class="shead"><span class="snum">01</span><h2>The run, recorded</h2></div>
+    <p class="sdesc">
+      One capture covers both sketches back to back. The rail under the player is built
+      from timestamps read straight off the simulator's Serial Monitor — click any band
+      to jump.
+    </p>
+
+    <div class="screen">
+      <video id="vid" controls preload="metadata"
+             poster="docs/screenshots/demo-poster.jpg"
+             playsinline>
+        <source src="docs/screenshots/demo.mp4" type="video/mp4">
+        Your browser can't play this video —
+        <a href="docs/screenshots/demo.mp4">download it instead</a>.
+      </video>
+    </div>
+
+    <div class="rail">
+      <div class="rail-top">
+        <span class="rail-lbl">Chapter rail · measured video time</span>
+        <span class="clock" id="clock">0:00 / 2:44</span>
+      </div>
+      <div class="track" id="track" role="presentation">
+        <div class="playhead" id="playhead"></div>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 02 TIMING ══ -->
+<section id="timing">
+  <div class="wrap">
+    <div class="shead"><span class="snum">02</span><h2>What sketch 1 commands</h2></div>
+    <p class="sdesc">
+      This diagram is not traced from the video — it is generated from the sketch's own
+      constants, so it shows exactly what the program orders each side of the chassis to
+      do across the full 150-second sequence. Note the shorter bars during the turns:
+      <code>TURN_SPEED</code> is 160, <code>DRIVE_SPEED</code> is 200.
+    </p>
+    <div class="scope">
+      <svg id="scope" viewBox="0 0 1000 250" role="img"
+           aria-label="Timing diagram: both sides forward for 30 seconds, both reverse for 60 seconds, then twelve alternating 5-second turn slices, then stop.">
+      </svg>
+      <div class="legend">
+        <span><i style="background:var(--phos)"></i>Left pair — FL + RL</span>
+        <span><i style="background:var(--cyan)"></i>Right pair — FR + RR</span>
+        <span><i style="background:var(--copper)"></i>Phase boundary</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 03 CIRCUIT ══ -->
+<section id="circuit">
+  <div class="wrap">
+    <div class="shead"><span class="snum">03</span><h2>One circuit, both sketches</h2></div>
+    <p class="sdesc">
+      Everything lives in a single Tinkercad design. Sketch 1 leaves the servo and the
+      sensor idle; sketch 2 uses all of it. No wire moves between them.
+    </p>
+    <figure>
+      <img src="docs/screenshots/circuit.png" width="1500" height="1120" loading="lazy"
+           alt="Tinkercad circuit: an Arduino Uno wired to two L293D chips on a breadboard, driving four DC motors, with a servo and a PING))) ultrasonic sensor.">
+      <figcaption>
+        Captured at simulator time 00:00:11 — the forward phase. All four motors read the
+        same sign at full <code>DRIVE_SPEED</code>.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ══ 04 PINS ══ -->
+<section id="pins">
+  <div class="wrap">
+    <div class="shead"><span class="snum">04</span><h2>Pin map</h2></div>
+    <p class="sdesc">
+      Twelve motor signals plus a servo plus a sensor overflow the twelve usable digital
+      pins, so A0–A2 serve as plain digital I/O. <span class="u1">U1</span> carries the
+      front axle, <span class="u2">U2</span> the rear.
+    </p>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Arduino</th><th>Chip pin</th><th>Function</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="pin pwm">D3</td>  <td><span class="u1">U1</span> 1,2EN</td><td>front-left enable / speed</td></tr>
+          <tr><td class="pin">D2 / D4</td> <td><span class="u1">U1</span> 1A / 2A</td><td>front-left direction</td></tr>
+          <tr><td class="pin pwm">D5</td>  <td><span class="u1">U1</span> 3,4EN</td><td>front-right enable / speed</td></tr>
+          <tr><td class="pin">D7 / D8</td> <td><span class="u1">U1</span> 3A / 4A</td><td>front-right direction</td></tr>
+          <tr><td class="pin pwm">D6</td>  <td><span class="u2">U2</span> 1,2EN</td><td>rear-left enable / speed</td></tr>
+          <tr><td class="pin">D12 / D13</td><td><span class="u2">U2</span> 1A / 2A</td><td>rear-left direction</td></tr>
+          <tr><td class="pin pwm">D11</td> <td><span class="u2">U2</span> 3,4EN</td><td>rear-right enable / speed</td></tr>
+          <tr><td class="pin">A0 / A1</td> <td><span class="u2">U2</span> 3A / 4A</td><td>rear-right direction</td></tr>
+          <tr><td class="pin">D10</td>     <td>—</td><td>servo signal (the shield's SERVO_1 pin)</td></tr>
+          <tr><td class="pin">A2</td>      <td>—</td><td>ultrasonic SIG</td></tr>
+          <tr><td class="pin">D9</td>      <td>—</td><td>free (spare PWM)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sdesc" style="margin-top:22px;margin-bottom:0">
+      <code>~</code> marks a hardware-PWM pin. The four enables deliberately skip pins 9
+      and 10 — see note C below.
+    </p>
+  </div>
+</section>
+
+<!-- ══ 05 SKETCHES ══ -->
+<section id="sketches">
+  <div class="wrap">
+    <div class="shead"><span class="snum">05</span><h2>The two programs</h2></div>
+    <div class="cards">
+      <div class="card">
+        <h3>Timed sequence</h3>
+        <div class="fname">Task1_FourMotorSequence.ino</div>
+        <ol>
+          <li>Forward — 30 s</li>
+          <li>Backward — 60 s</li>
+          <li>Right / left alternating — 60 s, in 5 s slices</li>
+          <li>Stop</li>
+        </ol>
+        <p>
+          Turns are tank turns: one side forward, the other reverse, pivoting in place.
+          The alternating phase is timed with <code>millis()</code> and trims its last
+          slice, so it ends on the minute even if you change the slice length.
+        </p>
+      </div>
+      <div class="card two">
+        <h3>Obstacle avoider</h3>
+        <div class="fname">Task2_ObstacleAvoider.ino</div>
+        <ol>
+          <li>Drive forward, ping every 60 ms</li>
+          <li>At ≤ 10 cm — stop all four motors</li>
+          <li>Reverse 0.6 s to open space</li>
+          <li>Servo looks right (30°), left (150°), back to centre</li>
+          <li>Turn toward whichever side has more room</li>
+        </ol>
+        <p>
+          The servo is the sensor's neck — one sensor covers three directions instead of
+          needing three sensors.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 06 NOTES ══ -->
+<section id="notes-sec">
+  <div class="wrap">
+    <div class="shead"><span class="snum">06</span><h2>Four things worth knowing</h2></div>
+    <p class="sdesc">
+      Details that cost real debugging time, or that look like faults until you check.
+    </p>
+    <div class="notes">
+
+      <div class="note">
+        <h3><em>A</em> The simulator can't reward the side-scan</h3>
+        <p>
+          In the recording, every scan prints
+          <code>free space right: 6 cm&nbsp;&nbsp;left: 6 cm</code> — identical both ways,
+          so the tie-break sends the robot right every single time.
+        </p>
+        <p>
+          That is the simulator, not the logic. Tinkercad's ultrasonic part exposes a
+          single global distance slider; it does not model space, so turning the servo
+          cannot change what the sensor reads. On real hardware the two scans differ and
+          the robot genuinely picks the roomier side. The comparison in
+          <code>avoidObstacle()</code> is unchanged either way.
+        </p>
+      </div>
+
+      <div class="note">
+        <h3><em>B</em> Negative rpm is not a wiring error</h3>
+        <p>
+          Tinkercad shows forward as <em>negative</em> rpm here. That is its own
+          convention for which motor terminal sits at the higher voltage. What matters is
+          that all four motors carry the <strong>same sign</strong> and
+          <strong>flip together</strong> — mixed signs at the slower turn speed are simply
+          a tank turn. Setting every <code>MOTOR_FLIP[]</code> entry to
+          <code>true</code> makes forward read positive.
+        </p>
+      </div>
+
+      <div class="note">
+        <h3><em>C</em> A servo cannot pass through an H-bridge</h3>
+        <p>
+          A servo is not a bare DC motor: it has its own H-bridge, potentiometer and
+          control chip, and it expects a PWM <em>signal</em> on one wire. So its signal
+          goes to <code>D10</code>, never to an L293D output.
+        </p>
+        <p>
+          That is exactly what the real L293D shield does — its servo headers are
+          hard-wired straight to pins 10 and 9 and bypass the chips entirely. D10 also
+          keeps the four PWM enables clear of pins 9 and 10, which the
+          <code>Servo</code> library disables when it seizes Timer1.
+        </p>
+      </div>
+
+      <div class="note">
+        <h3><em>D</em> Video time ≠ simulator time</h3>
+        <p>
+          Tinkercad fast-forwards through <code>delay()</code>, so the capture's clock
+          runs non-linearly against the simulator's: video 16 s reads 00:00:11, but video
+          49 s already reads 00:01:36. The chapter rail above therefore uses timestamps
+          measured from the Serial Monitor frame by frame, while the timing diagram in
+          section 02 is generated from the sketch constants. Two separate sources — never
+          mixed.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="repo" href="https://github.com/Sniper797/ST-2026-Arduino-4WD-L293D-Obstacle-Avoider">
+      ↗ Sniper797 / ST-2026-Arduino-4WD-L293D-Obstacle-Avoider
+    </a>
+    <p class="fnote">
+      Sketches, full pin-by-pin wiring guide and troubleshooting tables live in the repo.<br>
+      Part of my Smart Methods (ST 2026) summer training · Electrical · Task 2
+    </p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ─── chapter rail ─────────────────────────────────────
+     Boundaries were read off the Serial Monitor frame by frame, because the
+     capture's timeline does not track simulator time (see note D).            */
+  var DUR = 164.8;
+  var CH = [
+    {t:0,   k:"fwd",  n:"Forward",        s:"Task 1"},
+    {t:21,  k:"rev",  n:"Backward",       s:"Task 1"},
+    {t:45,  k:"turn", n:"Right / Left",   s:"Task 1"},
+    {t:112, k:"idle", n:"Sketch swap",    s:"serial clears"},
+    {t:118, k:"fwd",  n:"Driving",        s:"Task 2"},
+    {t:137, k:"stop", n:"Obstacle 10 cm", s:"Task 2"}
+  ];
+
+  var vid   = document.getElementById("vid");
+  var track = document.getElementById("track");
+  var head  = document.getElementById("playhead");
+  var chips = document.getElementById("chips");
+  var clock = document.getElementById("clock");
+
+  function fmt(s){
+    s = Math.max(0, Math.floor(s));
+    return Math.floor(s/60) + ":" + String(s%60).padStart(2,"0");
+  }
+  function seek(t){
+    if (!isFinite(vid.duration) && vid.readyState === 0) {
+      vid.addEventListener("loadedmetadata", function once(){ vid.currentTime = t; }, {once:true});
+      vid.load();
+    } else {
+      vid.currentTime = t;
+    }
+    vid.play().catch(function(){ /* autoplay may be blocked; the seek still lands */ });
+  }
+
+  /* build the bands, widths proportional to real duration */
+  CH.forEach(function(c,i){
+    var end = (i+1 < CH.length) ? CH[i+1].t : DUR;
+    var seg = document.createElement("div");
+    seg.className = "seg k" + "-" + c.k;
+    seg.style.flexBasis = ((end - c.t) / DUR * 100) + "%";
+    seg.style.flexGrow = "0";
+    seg.innerHTML = "<span>" + c.n + "</span>";
+    seg.title = c.n + " · " + c.s + " · " + fmt(c.t);
+    track.appendChild(seg);
+
+    var chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip";
+    chip.innerHTML = "<b>" + fmt(c.t) + "</b> &nbsp;" + c.n;
+    chip.addEventListener("click", function(){ seek(c.t + 0.15); });
+    chips.appendChild(chip);
+  });
+  track.appendChild(head); // keep the playhead on top of the bands
+
+  /* click anywhere on the rail to scrub */
+  track.addEventListener("click", function(e){
+    var r = track.getBoundingClientRect();
+    seek(Math.min(DUR - 0.2, Math.max(0, (e.clientX - r.left) / r.width * DUR)));
+  });
+
+  function active(t){
+    var idx = 0;
+    for (var i = 0; i < CH.length; i++) if (t >= CH[i].t) idx = i;
+    return idx;
+  }
+  vid.addEventListener("timeupdate", function(){
+    var d = vid.duration || DUR;
+    head.style.left = (vid.currentTime / d * 100) + "%";
+    clock.textContent = fmt(vid.currentTime) + " / " + fmt(d);
+    var a = active(vid.currentTime);
+    for (var i = 0; i < chips.children.length; i++) {
+      chips.children[i].setAttribute("aria-current", i === a ? "true" : "false");
+    }
+  });
+  vid.addEventListener("loadedmetadata", function(){
+    clock.textContent = "0:00 / " + fmt(vid.duration || DUR);
+  });
+
+  /* ─── timing diagram, generated from the sketch constants ─── */
+  var DRIVE = 200/255, TURN = 160/255, SLICE = 5, TOTAL = 158;
+  var ph = [];
+  ph.push({a:0,   b:30,  L: DRIVE, R: DRIVE, lab:"FORWARD 30 s"});
+  ph.push({a:30,  b:90,  L:-DRIVE, R:-DRIVE, lab:"BACKWARD 60 s"});
+  for (var i = 0; i < 12; i++) {                 // 60 s / 5 s = 12 slices
+    var a = 90 + i*SLICE, right = (i % 2 === 0); // slice 0 is turnRight()
+    ph.push({a:a, b:a+SLICE, L: right? TURN : -TURN, R: right? -TURN : TURN,
+             lab: right ? "R" : "L", slice:true});
+  }
+  ph.push({a:150, b:TOTAL, L:0, R:0, lab:"STOP"});
+
+  var W = 1000, PADL = 74, PADR = 16, TOP = 30, ROW = 74, GAP = 26, AMP = 26;
+  function X(t){ return PADL + t / TOTAL * (W - PADL - PADR); }
+
+  function trace(midY, key, colour){
+    var pts = [];
+    ph.forEach(function(p){
+      var y = midY - p[key] * AMP;
+      pts.push(X(p.a) + "," + y, X(p.b) + "," + y);
+    });
+    return '<polyline points="' + pts.join(" ") + '" fill="none" stroke="' + colour +
+           '" stroke-width="2.4" stroke-linejoin="miter" vector-effect="non-scaling-stroke"/>';
+  }
+
+  var y1 = TOP + AMP + 8, y2 = y1 + ROW - GAP + AMP;
+  var svg = "";
+
+  /* phase shading + boundary rules */
+  [[0,30],[30,90],[90,150],[150,TOTAL]].forEach(function(r,i){
+    if (i % 2 === 0) return;
+    svg += '<rect x="' + X(r[0]) + '" y="' + TOP + '" width="' + (X(r[1]) - X(r[0])) +
+           '" height="' + (y2 + AMP + 6 - TOP) + '" fill="rgba(255,255,255,.022)"/>';
+  });
+  [30,90,150].forEach(function(t){
+    svg += '<line x1="' + X(t) + '" y1="' + (TOP - 6) + '" x2="' + X(t) + '" y2="' +
+           (y2 + AMP + 10) + '" stroke="#8a5a2b" stroke-width="1" stroke-dasharray="3 3"/>';
+  });
+
+  /* zero rails */
+  [y1, y2].forEach(function(y){
+    svg += '<line x1="' + PADL + '" y1="' + y + '" x2="' + (W - PADR) + '" y2="' + y +
+           '" stroke="#22303f" stroke-width="1"/>';
+  });
+
+  svg += trace(y1, "L", "#57d99a");
+  svg += trace(y2, "R", "#49c2d6");
+
+  /* row labels */
+  var LB = 'font-family="IBM Plex Mono, monospace" font-size="11" fill="#8595a8"';
+  svg += '<text x="0" y="' + (y1 - AMP - 9) + '" ' + LB + '>LEFT</text>';
+  svg += '<text x="0" y="' + (y2 - AMP - 9) + '" ' + LB + '>RIGHT</text>';
+  svg += '<text x="0" y="' + (y1 + 4) + '" font-family="IBM Plex Mono, monospace" font-size="9" fill="#5b6a7d">0</text>';
+  svg += '<text x="0" y="' + (y2 + 4) + '" font-family="IBM Plex Mono, monospace" font-size="9" fill="#5b6a7d">0</text>';
+
+  /* time axis */
+  var ax = y2 + AMP + 26;
+  svg += '<line x1="' + PADL + '" y1="' + ax + '" x2="' + (W - PADR) + '" y2="' + ax +
+         '" stroke="#22303f" stroke-width="1"/>';
+  [0,30,60,90,120,150].forEach(function(t){
+    svg += '<line x1="' + X(t) + '" y1="' + ax + '" x2="' + X(t) + '" y2="' + (ax + 5) +
+           '" stroke="#334657" stroke-width="1"/>';
+    svg += '<text x="' + X(t) + '" y="' + (ax + 19) + '" text-anchor="middle" ' + LB + '>' + t + 's</text>';
+  });
+  svg += '<text x="' + (W - PADR) + '" y="' + (ax + 19) + '" text-anchor="end" ' +
+         'font-family="IBM Plex Mono, monospace" font-size="10" fill="#5b6a7d">simulator seconds</text>';
+
+  /* phase captions */
+  var CAP = 'font-family="Chakra Petch, sans-serif" font-size="11" font-weight="600" fill="#e39a54"';
+  [{a:0,b:30,t:"FORWARD"},{a:30,b:90,t:"BACKWARD"},{a:90,b:150,t:"RIGHT / LEFT × 12"},{a:150,b:TOTAL,t:"STOP"}]
+    .forEach(function(p){
+      svg += '<text x="' + ((X(p.a) + X(p.b)) / 2) + '" y="' + (TOP - 12) +
+             '" text-anchor="middle" ' + CAP + '>' + p.t + '</text>';
+    });
+
+  document.getElementById("scope").innerHTML = svg;
+})();
+</script>
+</body>
+</html>

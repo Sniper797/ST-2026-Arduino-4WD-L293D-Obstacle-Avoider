@@ -22,11 +22,28 @@ Wiring for both: **[`docs/WIRING.md`](docs/WIRING.md)**
 
 ## ▶️ See it run
 
-[![Watch the four motors run the timed sequence — click to play](docs/screenshots/demo-poster.jpg)](docs/screenshots/demo.mp4)
+### [**Open the live demo →**](https://sniper797.github.io/ST-2026-Arduino-4WD-L293D-Obstacle-Avoider/)
 
-**[Play the recording](docs/screenshots/demo.mp4)** — a screen capture of sketch 1 running
-in the Tinkercad simulator: all four motors drive forward, flip together at the 30 s
-mark, and then tank-turn right and left in 5 s slices.
+The recording with a **clickable chapter rail**, a timing diagram generated from the
+sketch's own constants, and the full pin map — right in your browser, no Arduino needed.
+
+[![Watch both sketches run in Tinkercad — click to play](docs/screenshots/demo-poster.jpg)](docs/screenshots/demo.mp4)
+
+**[Play the recording](docs/screenshots/demo.mp4)** — one capture covers **both sketches
+back to back**:
+
+| Video time | What's happening |
+|---|---|
+| 0:00 – 0:21 | **Sketch 1** — all four motors forward |
+| 0:21 – 0:45 | **Sketch 1** — all four flip together, backward |
+| 0:45 – 1:52 | **Sketch 1** — tank-turning right / left in 5 s slices |
+| 1:52 – 1:58 | sketch swapped, Serial Monitor clears |
+| 1:58 – 2:17 | **Sketch 2** — driving forward, scanning |
+| 2:17 – end | **Sketch 2** — `Obstacle within 10 cm -> STOP`, reverse, scan, turn |
+
+> These timestamps were read off the Serial Monitor frame by frame, because Tinkercad
+> fast-forwards through `delay()` — the capture's clock does **not** track simulator time.
+> Video 16 s reads `00:00:11`, but video 49 s already reads `00:01:36`.
 
 > GitHub does not play a committed video *inside* a README, so it appears here as the
 > clickable thumbnail above. To make it play inline instead, open this README in GitHub's
@@ -186,6 +203,16 @@ long clearance(long distanceCm) {
   return (distanceCm == NO_ECHO) ? FAR_AWAY_CM : distanceCm;
 }
 ```
+
+**Why the recording always turns right.** In the demo every scan prints
+`free space  right: 6 cm   left: 6 cm` — identical both ways, so the tie-break
+(`right >= left`) sends the robot right every single time.
+
+That is the simulator, not the logic. **Tinkercad's ultrasonic part exposes one global
+distance slider; it does not model space**, so turning the servo cannot change what the
+sensor reads. On real hardware the two scans differ and the robot genuinely picks the
+roomier side. Nothing in `avoidObstacle()` needs changing — the comparison is already
+correct, the simulator just can't exercise it.
 
 Swap to the 4-pin **HC-SR04** by setting `#define ULTRASONIC_4_PIN 1` and wiring
 `TRIG → A2`, `ECHO → A3`.
