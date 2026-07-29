@@ -245,7 +245,10 @@ footer{padding:52px 0 72px;color:var(--faint);font-size:.9rem}
     <p class="sdesc">
       One capture covers both sketches back to back. The rail under the player is built
       from timestamps read straight off the simulator's Serial Monitor — click any band
-      to jump.
+      to jump. Heads-up: the capture <strong>cuts sketch 1 short</strong>. The Serial
+      Monitor reaches 6 of its 12 turn slices before the sketch is swapped, so
+      <code>Sequence complete</code> never prints and the full 150-second run is not shown
+      end to end. Section 02 is what the program commands; this is what the capture caught.
     </p>
 
     <div class="screen">

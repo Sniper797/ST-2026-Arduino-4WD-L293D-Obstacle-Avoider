@@ -41,14 +41,21 @@ back to back**:
 |---|---|
 | 0:00 – 0:21 | **Sketch 1** — all four motors forward |
 | 0:21 – 0:45 | **Sketch 1** — all four flip together, backward |
-| 0:45 – 1:52 | **Sketch 1** — tank-turning right / left in 5 s slices |
-| 1:52 – 1:58 | sketch swapped, Serial Monitor clears |
+| 0:45 – 1:53 | **Sketch 1** — tank-turning right / left in 5 s slices |
+| 1:53 – 1:58 | sketch swapped, Serial Monitor clears |
 | 1:58 – 2:17 | **Sketch 2** — driving forward, scanning |
 | 2:17 – end | **Sketch 2** — `Obstacle within 10 cm -> STOP`, reverse, scan, turn |
 
 > These timestamps were read off the Serial Monitor frame by frame, because Tinkercad
 > fast-forwards through `delay()` — the capture's clock does **not** track simulator time.
 > Video 16 s reads `00:00:11`, but video 49 s already reads `00:01:36`.
+>
+> ⚠️ The capture **cuts sketch 1 short**: the Serial Monitor reaches 6 of its 12 turn
+> slices before the sketch is swapped, so `Sequence complete` never prints and the full
+> 150-second sequence is not shown running to the end. The timing diagram on the
+> [demo page](https://sniper797.github.io/ST-2026-Arduino-4WD-L293D-Obstacle-Avoider/) is
+> generated from the sketch constants, so it shows the complete intended sequence
+> regardless — the two are deliberately separate sources.
 
 > GitHub does not play a committed video *inside* a README, so it appears here as the
 > clickable thumbnail above. To make it play inline instead, open this README in GitHub's
