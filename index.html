@@ -490,8 +490,10 @@ footer{padding:52px 0 72px;color:var(--faint);font-size:.9rem}
   var chips = document.getElementById("chips");
   var clock = document.getElementById("clock");
 
+  /* Round rather than floor: the native <video> control rounds, and this clock
+     sits directly beneath it -- flooring made the two disagree by a second.   */
   function fmt(s){
-    s = Math.max(0, Math.floor(s));
+    s = Math.max(0, Math.round(s));
     return Math.floor(s/60) + ":" + String(s%60).padStart(2,"0");
   }
   function seek(t){
