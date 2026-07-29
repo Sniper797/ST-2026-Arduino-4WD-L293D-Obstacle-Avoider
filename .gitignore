@@ -1,0 +1,11 @@
+# Raw screen recordings live in ../_originals-backup, never in the repo.
+# GitHub hard-rejects any single file over 100 MB, and a raw 2560x1302 capture
+# of this simulation is ~160 MB. Commit the compressed docs/screenshots/demo.mp4
+# instead (ffmpeg -vf scale=1280:-2 -crf 28 -an brings it under 3 MB).
+Screen Recording*.mp4
+*.mkv
+
+# Windows / macOS shell cruft
+Thumbs.db
+desktop.ini
+.DS_Store
