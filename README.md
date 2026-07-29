@@ -27,6 +27,11 @@ Wiring for both: **[`docs/WIRING.md`](docs/WIRING.md)**
 The recording with a **clickable chapter rail**, a timing diagram generated from the
 sketch's own constants, and the full pin map — right in your browser, no Arduino needed.
 
+> 🔗 **Open the circuit in Tinkercad:** https://www.tinkercad.com/things/41ROZfqAmAn-smashing-gaaris-crift?sharecode=N_CUYkUWnLUDYpL4sN1UB75yST0zl_tYEjezFBg6brk
+> *(the `sharecode` on the end is what makes it viewable by anyone — don't trim it)*
+>
+> Run it yourself: paste either sketch into the Code panel and press **Start Simulation**.
+
 [![Watch both sketches run in Tinkercad — click to play](docs/screenshots/demo-poster.jpg)](docs/screenshots/demo.mp4)
 
 **[Play the recording](docs/screenshots/demo.mp4)** — one capture covers **both sketches

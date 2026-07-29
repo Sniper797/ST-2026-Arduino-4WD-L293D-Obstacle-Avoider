@@ -193,6 +193,9 @@ footer{padding:52px 0 72px;color:var(--faint);font-size:.9rem}
   padding:12px 18px;transition:all .18s;background:var(--panel);
 }
 .repo:hover{border-color:var(--copper);color:var(--copper);transform:translateY(-1px)}
+.repo.live{border-color:var(--copper-deep)}
+.repo.live:hover{border-color:var(--phos);color:var(--phos)}
+.links{display:flex;flex-wrap:wrap;gap:12px}
 .fnote{margin-top:26px;font-family:var(--mono);font-size:11px;line-height:1.8}
 
 /* ─── entrance ───────────────────────────────────────── */
@@ -307,6 +310,11 @@ footer{padding:52px 0 72px;color:var(--faint);font-size:.9rem}
         same sign at full <code>DRIVE_SPEED</code>.
       </figcaption>
     </figure>
+    <p style="margin-top:22px">
+      <a class="repo live" href="https://www.tinkercad.com/things/41ROZfqAmAn-smashing-gaaris-crift?sharecode=N_CUYkUWnLUDYpL4sN1UB75yST0zl_tYEjezFBg6brk">
+        ↗ Open this circuit in Tinkercad
+      </a>
+    </p>
   </div>
 </section>
 
@@ -457,9 +465,14 @@ footer{padding:52px 0 72px;color:var(--faint);font-size:.9rem}
 
 <footer>
   <div class="wrap">
-    <a class="repo" href="https://github.com/Sniper797/ST-2026-Arduino-4WD-L293D-Obstacle-Avoider">
-      ↗ Sniper797 / ST-2026-Arduino-4WD-L293D-Obstacle-Avoider
-    </a>
+    <div class="links">
+      <a class="repo" href="https://github.com/Sniper797/ST-2026-Arduino-4WD-L293D-Obstacle-Avoider">
+        ↗ Sniper797 / ST-2026-Arduino-4WD-L293D-Obstacle-Avoider
+      </a>
+      <a class="repo live" href="https://www.tinkercad.com/things/41ROZfqAmAn-smashing-gaaris-crift?sharecode=N_CUYkUWnLUDYpL4sN1UB75yST0zl_tYEjezFBg6brk">
+        ↗ Live circuit on Tinkercad
+      </a>
+    </div>
     <p class="fnote">
       Sketches, full pin-by-pin wiring guide and troubleshooting tables live in the repo.<br>
       Part of my Smart Methods (ST 2026) summer training · Electrical · Task 2
