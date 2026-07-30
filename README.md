@@ -39,9 +39,10 @@ back to back**:
 
 | Video time | What's happening |
 |---|---|
-| 0:00 – 0:21 | **Sketch 1** — all four motors forward |
-| 0:21 – 0:45 | **Sketch 1** — all four flip together, backward |
-| 0:45 – 1:53 | **Sketch 1** — tank-turning right / left in 5 s slices |
+| 0:00 – 0:20 | **Sketch 1** — all four motors forward |
+| 0:20 – 0:43 | **Sketch 1** — all four flip together, backward |
+| 0:43 – 1:45 | **Sketch 1** — tank-turning right / left in 5 s slices |
+| 1:45 | **Sketch 1** — `Sequence complete - motors stopped.` |
 | 1:53 – 1:58 | sketch swapped, Serial Monitor clears |
 | 1:58 – 2:17 | **Sketch 2** — driving forward, scanning |
 | 2:17 – end | **Sketch 2** — `Obstacle within 10 cm -> STOP`, reverse, scan, turn |
@@ -50,12 +51,12 @@ back to back**:
 > fast-forwards through `delay()` — the capture's clock does **not** track simulator time.
 > Video 16 s reads `00:00:11`, but video 49 s already reads `00:01:36`.
 >
-> ⚠️ The capture **cuts sketch 1 short**: the Serial Monitor reaches 6 of its 12 turn
-> slices before the sketch is swapped, so `Sequence complete` never prints and the full
-> 150-second sequence is not shown running to the end. The timing diagram on the
-> [demo page](https://sniper797.github.io/ST-2026-Arduino-4WD-L293D-Obstacle-Avoider/) is
-> generated from the sketch constants, so it shows the complete intended sequence
-> regardless — the two are deliberately separate sources.
+> One more reason to keep the two sources apart: the capture's Serial Monitor prints
+> **14** `turning` lines, while 60 s ÷ `TURN_SLICE_MS` 5 s says **12**. Under fast-forward
+> the simulator's `delay()` and `millis()` don't advance in lockstep, so more, shorter
+> slices fit the same window. The sketch-derived timing diagram on the
+> [demo page](https://sniper797.github.io/ST-2026-Arduino-4WD-L293D-Obstacle-Avoider/)
+> is right about the program; the log is right about this run.
 
 > GitHub does not play a committed video *inside* a README, so it appears here as the
 > clickable thumbnail above. To make it play inline instead, open this README in GitHub's
